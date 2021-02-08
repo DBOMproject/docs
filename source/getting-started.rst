@@ -45,7 +45,7 @@ Launch the network using docker-compose
 
 ::
 
-   docker-compose -f  ocker-compose.yaml up -d --build
+   docker-compose -f docker-compose.yaml up -d --build
 
 Once you run this command, the images will be built from the source code
 and then the containers will be up and running. You can check the status
