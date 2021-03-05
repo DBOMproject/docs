@@ -93,6 +93,20 @@ Agents can be created for
 - Private DLTs (Eg. Hyperledger Fabric, Corda Enterprise e.t.c)
 - Public DLTs (Eg. The IOTA Tangle, Ethereum)
 - Traditional Datastores (Eg. MongoDB, PostgreSQL e.t.c)
+- Transparency Logs (Eg. Trillian_)
+
+.. _Trillian: https://github.com/google/trillian
+==========
+Extensions
+==========
+
+Extensions allow of other supply chain solutions to store and access data from a DBoM. 
+
+The currently supported extensions are:
+
+- in-toto_
+
+.. _in-toto: https://github.com/in-toto/in-toto
 
 
 ========================
