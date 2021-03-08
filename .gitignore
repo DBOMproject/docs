@@ -40,3 +40,8 @@ Thumbs.db
 # Editor backup files #
 #######################
 *~
+
+
+# IDE #
+#######################
+.vscode
