@@ -1,6 +1,6 @@
 
-Welcome to Digital Bill of Materials's documentation!
-=====================================================
+Digital Bill of Materials - Documentation
+=========================================
 
 The Digital Bill of Materials (DBoM) Consortium Linux Foundation project seeks to improve supply chain efficiency by enabling more effective attestation sharing among supply chain partners. Find us at `dbom.io <http://dbom.io/>`_ . 
 To know more go to :doc:`what-dbom` or if you want to get started and set up a DBoM Node go to :doc:`getting-started`.

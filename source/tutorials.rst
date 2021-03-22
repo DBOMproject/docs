@@ -52,11 +52,111 @@ The agent is configured to automatically reload the agent config if any
 changes occur on the configmap or in the file-system
 
 
-=================================================
-Connecting Multiple Nodes to a MongoDB Repository
-=================================================
+=========================
+Connecting Multiple Nodes 
+=========================
 
 
-==============================================
-Connecting multiple nodes to IOTA MAM Channels
-==============================================
+MongoDB (Database Agent)
+------------------------
+
+This can be done by configuring the same mongoDB URI for the database-agent deployment for each node, either by using docker environment variables or the appropriate keys in the Kubernetes configmap
+
+Find out more from the the deployment repository:
+
+- `Docker Compose <https://github.com/DBOMproject/deployments/tree/master/docker-compose-quickstart>`__
+- `Kubernetes <https://github.com/DBOMproject/deployments/tree/master/charts/database-agent>`__
+
+Ensure that both nodes have the agent configuration correctly set with the same names for the repositories. Access control to channels is facilitated by MongoDB Collection Level Role Based Access Control. Find how that can be setup by referring to the `official MongoDB documentation <https://docs.mongodb.com/manual/core/collection-level-access-control/>`__
+
+IOTA (IOTA MAM Agent)
+---------------------
+
+To know more about setting up multiple channels for the IOTA MAM Agent, go to the `official repository <https://github.com/DBOMproject/iota-agent#multi-node-channel-support>`__
+
+.. _gw-extension-apis:
+
+================================
+Using The Gateway Extension APIs
+================================
+
+In addition to the core create, update, attach, detach and audit APIs, the gateway has extension APIs that provide utility functions. These tutorials guide you through using them
+
+
+Transfer API
+------------
+
+The Transfer API allows you to copy over an asset from one attestation channel to another. This could be useful when you're moving an asset downstream in the supply chain, where entities only have visibility into a limited set of the channels
+
+.. image:: _static/img/transfer-asset-example.png
+  :alt: Example transfer scenario
+
+Pictured above is an example scenario where the "Supplier-Manufacturer" channel's policy restricts it to be read by just the supplier and the manufacturer. 
+
+If the manufacturer wanted to share this asset downstream with the distributor, they can transfer it to the "Manufacturer-Distributor" channel, whose policies allow the distributor to read it
+
+When a transfer occurs, the metadata required to find the transfer destination and source are embedded into the asset payload. This allows you to track the asset's audit trail throughout it's lifetime
+
+Using the REST API
+^^^^^^^^^^^^^^^^^^
+
+Import the `Postman files for the Gateway <https://github.com/DBOMproject/api-specs/tree/master/gateway/postman>`__ to experiment with the REST API.
+
+Open up the postman collection and navigate to the "Transfer an Asset" request. Enter your parameters for repo ID, channel ID and asset ID (source) into the http parameters tab
+
+When you navigate to the "body" tab, you will see the following payload 
+
+.. code-block:: json
+
+    {
+        "transferDescription": "...",
+        "repoID": "...",
+        "channelID": "...",
+        "assetID": "..."
+    }
+
+The ``repoID``, ``channelID`` and ``assetID`` referred to in the body must be replaced with the destination repo, channel and asset id that you want the asset to assume after the transfer operation. You can also provide a ``transferDescription`` to provide context for the transfer operation
+
+Once transferred, the source and destination assets will be amended with a ``custodyTransferEvents`` JSON array, which reflects all the transfer events that have occured on the asset. As this is part of the asset payload, it is immutably reflected in the asset audit trail. 
+
+.. note::
+
+    By default, the source asset is also marked 'read-only' by the gateway.
+
+If you retrieve the destination or source asset that you transferred right now, you'll find the following key added to the asset payload:  
+
+.. code-block:: json
+
+    "custodyTransferEvents ": [
+            {
+                "timestamp": "2021-03-22T11:22:14.589Z",
+                "transferDescription": "moved",
+                "sourceRepoID": "DB1",
+                "sourceChannelID": "C1",
+                "sourceAssetID": "ABC02",
+                "destinationRepoID": "DB1",
+                "destinationChannelID": "C2",
+                "destinationAssetID": "ABC02"
+            }
+        ],
+
+This event tells the requestor that this asset was moved from DB1,C1 to DB1,C2 at the shown timestamp with the description "moved". The presence of this event on the asset can be used in your applications to recursively retrieve the state of the asset across multiple channels in order to trace and establish provenance of the asset.
+
+
+Transfer Policies
+^^^^^^^^^^^^^^^^^^
+.. note::
+
+    This subsection describes functionality that has not yet been implemented in the OSS DBoM Gateway
+
+There are cases where you would want to mark assets on a channel as being transferrable only if it meets the criteria set by channel-wide or asset-specific policies. 
+
+This is where transfer policies come in. They allow you to set channel wide or asset specific policies for transfer including 
+
+- the ability to disable transfers altogether
+- controlled transfers that are limited to specific repositories and channels 
+
+Channels will have a default transfer policy, which will apply to all assets that don't have an explicit channel policy specified, however if the asset references a specific policy as part of the asset metadata, that policy will override the default policy set at the channel level
+
+
+

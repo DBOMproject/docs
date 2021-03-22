@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = u'Digital Bill of Materials'
-copyright = u'2020, DBoM Project'
+copyright = u'2020-2021, DBoM Project'
 author = u'DBoM Project'
 
 # The short X.Y version
