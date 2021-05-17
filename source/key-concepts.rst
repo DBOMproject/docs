@@ -126,6 +126,10 @@ The current policy that is applied to any subscriber of a channel is Read/Write.
 
 For a more granular management of permissions, a policy management plugin is required for each channel to ensure that they have policies-based accesses by its subscribers. 
 
+.. note::
+
+    This subsection describes functionality that has not yet been implemented in the OSS DBoM Gateway
+
 The plugin will provide a framework for governance of information and attestations.
 Policies will be enforced on channels that are created by the Designated Repository Owner (DRO).
 

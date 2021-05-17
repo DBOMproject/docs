@@ -100,7 +100,7 @@ When a transfer occurs, the metadata required to find the transfer destination a
 Using the REST API
 ^^^^^^^^^^^^^^^^^^
 
-Import the `Postman files for the Gateway <https://github.com/DBOMproject/api-specs/tree/master/gateway/postman>`__ to experiment with the REST API.
+Import the `postman files for the Gateway <https://github.com/DBOMproject/api-specs/tree/master/gateway/postman>`__ to experiment with the REST API.
 
 Open up the postman collection and navigate to the "Transfer an Asset" request. Enter your parameters for repo ID, channel ID and asset ID (source) into the http parameters tab
 
@@ -159,4 +159,19 @@ This is where transfer policies come in. They allow you to set channel wide or a
 Channels will have a default transfer policy, which will apply to all assets that don't have an explicit channel policy specified, however if the asset references a specific policy as part of the asset metadata, that policy will override the default policy set at the channel level
 
 
+Export API
+------------
 
+The export api lets you retrieve an entire asset tree from the DBoM (i.e. including all parent and child assets). This could be useful if you are moving an asset and all associated sub assets into another system for processing
+
+Take an example where you create a bunch of assets and attach them as shown below.
+
+.. image:: _static/img/export-example.png
+  :width: 300px
+  :align: center  
+  :alt: Example export scenario
+
+If you wanted to export these assets out at once into another system, you can run export on any of these assets and the entire tree will be returned as JSON.
+
+For instance, let's say we try exporting `ExportTestA1`, we will get a JSON payload with all its children upto the leaf level (i.e `ExportTestA2`, `ExportTestA3` and `ExportTestA4`). 
+However, if we try to export `ExportTestA2`, we will get all children and direct ancestors (i.e `ExportTestA1` and `ExportTestA4`) 
