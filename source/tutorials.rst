@@ -51,6 +51,53 @@ Parameters
 The agent is configured to automatically reload the agent config if any
 changes occur on the configmap or in the file-system
 
+======================
+Customized Deployments
+======================
+
+This section covers non-default deployment configurations that may be useful when deploying DBoM core services in production or niche use cases
+
+Using TLS and x.509 authentication with MongoDB
+-----------------------------------------------
+
+In a production deployment, if you are choosing to use the mongodb repository implementation (database-agent), the recommended way to securely communicate to the repository is to use the built-in TLS support and x.509 user authentication.
+
+This is fairly simple to do as database agent, and the mongodb-audit watcher (which is run by the repository owner) has built in support for mutual TLS authentication and authorization.
+
+To begin with, you will have to configure your mongodb deployment to use tls and x.509 client authentication. The generation of certificates and configuration of the mongodb server is outside the scope of the DBoM documentation.
+
+However, if you want to try out this deployment by creating a local CA which can sign a certificate, follow the official mongoDB documentation:
+
+- `Creating CA Certificates <https://docs.mongodb.com/manual/appendix/security/appendixA-openssl-ca/>`_
+- `Creating Certificates for your MongoDB Server <https://docs.mongodb.com/manual/appendix/security/appendixB-openssl-server/>`_
+- `Creating Certificates for Mongo clients <https://docs.mongodb.com/manual/appendix/security/appendixC-openssl-client/>`_
+
+You will need to generate multiple client certificates and associated user roles, as follows:
+
+- One for the mongodb-audit-watcher, having read access to your channels collection as well as the ability to listen to change streams
+- One for each DBoM node that you want joined to the repository, having appropriate access control to the channel collections
+
+The details for creating these roles are present in the `MongoDB documentation for Users and Roles <https://docs.mongodb.com/manual/tutorial/manage-users-and-roles/>`_ and `x.509 authentication for clients <https://docs.mongodb.com/manual/tutorial/configure-x509-client-authentication/>`_
+
+Once you have configured mongodb with the certificates that you have generated, it is now time to configure the database agent instances and the mongoDB audit watcher appropriately
+
+This is done using environment variables. Set the appropriate environment variables, as specified in the README for `database-agent <https://github.com/DBOMproject/database-agent>`_ and `mongodb-audit-watcher <https://github.com/DBOMproject/mongodb-audit-watcher>`_. If you are using docker, ensure that the certificates that you are providing are available within the container as a volume mount.
+
+.. list-table:: Example Environment Variables
+   :header-rows: 1
+   :align: center
+
+   * - Key
+     - Value   
+   * - MONGO_TLS_MODE_ENABLED
+     - ``1``
+   * - MONGO_TLS_CLIENT_CERT_PATH
+     - ``.secrets/client_cert.pem``
+   * - MONGO_TLS_CA_CERT_PATH
+     - ``.secrets/ca_cert.pem``
+
+If you are using Helm Charts to deploy on Kubernetes, these keys are stored within a secret. Refer to the helm chart READMEs for further details.
+
 
 =========================
 Connecting Multiple Nodes 
