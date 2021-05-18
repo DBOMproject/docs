@@ -62,10 +62,17 @@ The Gateway is the component that manages connections to one or more agents and 
 -   Detach Subasset
 -   Get Asset Audit Trail
 
-The main function of a Gateway include:
+The gateway additionally has extension APIs that allow you to:
+
+-   Transfer assets across repositories and channels
+-   Export assets with expanded parent and child links as a JSON Tree
+-   Validate a signed asset using PKI
+
+For instructions on using these extension APIs, refer to the API Specification or the :ref:`gateway extension APIs tutorial <gw-extension-apis>`.
+
+The main function of the DBoM Gateway include:
 
 - Maintain and validate the connection configuration for its agent(s)
-- Manage authentication and authorization using a Role Based Access Control model
 - Convert API calls by its external service users to the correponding calls to corresponding Agent. 
 - Validate the semantic structure of the asset being written to the repository by leveraging JSONSchema defined in the REST-Schema folder.  
 
@@ -96,6 +103,8 @@ Agents can be created for
 - Transparency Logs (Eg. Trillian_)
 
 .. _Trillian: https://github.com/google/trillian
+
+
 ==========
 Extensions
 ==========
@@ -116,6 +125,10 @@ Policy Management Plugin
 The current policy that is applied to any subscriber of a channel is Read/Write.
 
 For a more granular management of permissions, a policy management plugin is required for each channel to ensure that they have policies-based accesses by its subscribers. 
+
+.. note::
+
+    This subsection describes functionality that has not yet been implemented in the OSS DBoM Gateway
 
 The plugin will provide a framework for governance of information and attestations.
 Policies will be enforced on channels that are created by the Designated Repository Owner (DRO).
