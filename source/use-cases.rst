@@ -39,3 +39,7 @@ The Future of Software Attestation Sharing
 The Digital Bill of Materials introduces a platform where SBOMs can be shared in a uniform manner, supported by a framework of tools and services that enable automation. The core design that focuses on interoperability makes it easy to switch between diverse types of repositories and attestation formats, helping organizations overcome vendor lock in 
 This ease of use is coupled with strong permission controls and auditability that enable organizations to granularly control distribution of sensitive data, while ensuring provenance of every attestation. This framework will enable organizations to seamlessly integrate SBOMs into their software lifecycle processes, and help ensure software supply chain security at scale
 
+Interesting links to more material on SBOMs:
+
+- `Minimum Elements of an SBOM - National Telecommunications and Information Administration <https://www.ntia.doc.gov/report/2021/minimum-elements-software-bill-materials-sbom>`__
+
