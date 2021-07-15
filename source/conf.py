@@ -161,7 +161,7 @@ html_theme_options = {
 }
 
 
-html_logo = "https://i.imgur.com/X8TGEeB.png"
+html_logo = "img/dbom-logo.png"
 html_theme_options = {
     'logo_only': True,
     'display_version': False,
