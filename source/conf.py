@@ -161,7 +161,7 @@ html_theme_options = {
 }
 
 
-html_logo = "../_static/img/dbom-logo.png"
+html_logo = "_static/img/dbom-logo.png"
 html_theme_options = {
     'logo_only': True,
     'display_version': False,
