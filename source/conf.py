@@ -41,6 +41,7 @@ release = u''
 extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -188,7 +189,8 @@ epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
 extensions = [
-    "sphinx_rtd_theme"
+    "sphinx_rtd_theme",
+    'sphinx.ext.autosectionlabel'
 ]
 # -- Options for intersphinx extension ---------------------------------------
 
@@ -199,3 +201,7 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+
+# Make sure the target is unique
+autosectionlabel_prefix_document = True
