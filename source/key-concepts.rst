@@ -1,7 +1,7 @@
 Key Concepts 
 ============
 
-The Digital Bill of Materials (DBoM) is a solution compromised of software components that allow partners to share attestations through a set of supported repositories such as databases, private and permissioned distributed ledgers or public Blockchains such as Etherium or IOTA.
+The Digital Bill of Materials (DBoM) is a solution comprised of software components that allow partners to share attestations through a set of supported repositories such as databases, private and permissioned distributed ledgers or public Blockchains such as Etherium or IOTA.
 
 The main capability provided by DBoM is a common way to set up private or broadcast channels between two or more partners to share information.
 As shown in the following diagram, partners exchange information through their DBoM node(s).  
