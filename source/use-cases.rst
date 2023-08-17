@@ -42,4 +42,3 @@ This ease of use is coupled with strong permission controls and auditability tha
 Interesting links to more material on SBOMs:
 
 - `Minimum Elements of an SBOM - National Telecommunications and Information Administration <https://www.ntia.doc.gov/report/2021/minimum-elements-software-bill-materials-sbom>`__
-

@@ -20,8 +20,9 @@
 # -- Project information -----------------------------------------------------
 
 project = u'Digital Bill of Materials'
-copyright = u'2020-2021, DBoM Project'
+copyright = u'2020-2023, DBoM Project'
 author = u'DBoM Project'
+language = 'en'
 
 # The short X.Y version
 version = u''
@@ -190,6 +191,7 @@ epub_exclude_files = ['search.html']
 # -- Extension configuration -------------------------------------------------
 extensions = [
     "sphinx_rtd_theme",
+    'sphinx_copybutton',
     'sphinx.ext.autosectionlabel'
 ]
 # -- Options for intersphinx extension ---------------------------------------

@@ -19,7 +19,6 @@ Index
    key-concepts
    getting-started
    tutorials
-   query
    faq
    use-cases
    getting-help
