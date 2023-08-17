@@ -22,7 +22,6 @@
 project = u'Digital Bill of Materials'
 copyright = u'2020-2023, DBoM Project'
 author = u'DBoM Project'
-language = 'en'
 
 # The short X.Y version
 version = u''
@@ -62,7 +61,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
