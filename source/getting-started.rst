@@ -6,19 +6,21 @@ Getting Started
 Docker
 ======
 
-This tutorial will describe how to get started with the digital bill of materials using docker. The sample docker-compose file will build and run 3 containers viz.
+This tutorial will describe how to get started with the digital bill of materials using docker. The sample docker-compose file will build and run the required containers to get started.
 
 -  chainsource-gateway
 -  database-agent
--  mongodb
+-  nats
+-  mongodb (local - with prisma)
 
-Once these containers are running, the Chainsource gateway provides a REST interface with the APIs as described in the `API Specs`.
+
+Once these containers are running, the DBoM gateway (chainsource-gateway) provides a REST interface with the APIs as described in the `API Specs <https://github.com/DBOMproject/api-specs/tree/2.0.0-alpha-1>`__ 
 
 Prerequisites and setup
 ------------------------
 
--  `Docker <https://www.docker.com/products/overview>`__ - v18.0 or higher
--  `Docker Compose <https://docs.docker.com/compose/overview/>`__ - v1.25.0 or higher
+-  `Docker <https://www.docker.com/products/overview>`__ - v24.0.2 or higher
+-  `Docker Compose <https://docs.docker.com/compose/overview/>`__ - v2.19.1 or higher
 -  `Git client <https://git-scm.com/downloads>`__ - needed for clone commands
 
 Running the sample program
@@ -27,37 +29,47 @@ Running the sample program
 Terminal Window
 ~~~~~~~~~~~~~~~
 
-Step 1
+Step 1 
 ^^^^^^
 
-Clone the `deployments repository <https://github.com/DBOMproject/deployments>`__ and navigate to the docker-compose-quickstart folder
+Clone the `deployments repository <https://github.com/DBOMproject/deployments>`__ check out to `2.0.0-alpha-1` branch and navigate to the `docker-compose-quickstart` folder
 
-::
+.. code-block:: shell
 
-    git clone https://github.com/DBOMproject/deployments.git
-    cd deployments/docker-compose-quickstart
+    # Clone the deployments repository
+   git clone https://github.com/DBOMproject/deployments.git
 
+   # Checkout to 2.0.0-alpha-1
+   git checkout 2.0.0-alpha-1
+
+   # Navigate to the docker-compose-quickstart folder
+   cd deployments/docker-compose-quickstart
 
 Step 2
 ^^^^^^
 
 Launch the network using docker-compose
 
-::
+.. code-block:: shell
 
-   docker-compose -f docker-compose.yaml up -d --build
+   # Generate certificates
+   # node1.test.com - should be same as your container/node name
+   docker compose -f docker-compose-certs.yml  run --rm certificate_generator ./Generator node1.test.com
+
+   # Run all the services
+   docker compose up -d
 
 Once you run this command, the images will be built from the source code
 and then the containers will be up and running. You can check the status
 of the containers by running the following command
 
-::
+.. code-block:: shell
 
    docker ps
 
 The output of the above command should be like below
 
-.. image:: _static/img/docker-ps.png
+.. image:: _static/img/getting-started.png
   :alt: docker ps output
 
 
@@ -68,567 +80,1000 @@ Execute the REST API sample requests from the section `Sample REST APIs Requests
 
 With the containers started, next, test the APIs by executing the script *testAPIs.sh*
 
-::
+.. code-block:: shell
 
    ./testAPIs.sh
 
 
 Sample REST API Requests
--------------------------
+------------------------
 
-Create Asset Requests
-~~~~~~~~~~~~~~~~~~~~~
+Node Requests
+~~~~~~~~~~~~~
 
+**Get Node 1 _metadata**
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Create Asset-7991 on Channel C1
+.. code-block:: shell
 
-::
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/_metadata' \
+   --header 'Accept: application/json'
 
-   curl -f --location --request POST "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7991" \
-   --header 'Content-Type: application/json' \
-   --data-raw '{
-       "standardVersion": 1.0,
-       "documentName": "Test Asset 01",
-       "documentCreator": "DBoM Organisation",
-       "documentCreatedDate": "2020-10-01T10:06:47+0000",
-       "assetType": "HardwareComponent",
-       "assetSubType": "SubType1",
-       "assetManufacturer": "DBoM Organisation",
-       "assetModelNumber": "ABCXYZ",
-       "assetDescription": "A DBoM Asset",
-       "assetMetadata": {  
-           "aKey": "aValue"
-       },
-       "manufactureSignature": "UNSIGNED(TEST)"
-   }'
-
-**Output:**
+Output:
 
 .. code-block:: json
-
-   {
-       "success":true,
-       "status":"Successfully created on the agent"
-   }
-
--  Create Asset-7992 on Channel C1
-
-::
-
-   curl -f --location --request POST "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7992" \
-   --header 'Content-Type: application/json' \
-   --data-raw '{
-       "standardVersion": 1.0,
-       "documentName": "Test Asset 02",
-       "documentCreator": "DBoM Organisation",
-       "documentCreatedDate": "2020-10-01T10:06:47+0000",
-       "assetType": "HardwareComponent",
-       "assetSubType": "SubType1",
-       "assetManufacturer": "DBoM Organisation",
-       "assetModelNumber": "ABCXYZ",
-       "assetDescription": "A DBoM Asset",
-       "assetMetadata": {  
-           "aKey": "aValue"
-       },
-       "manufactureSignature": "UNSIGNED(TEST)"
-   }'
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "success":true,
-       "status":"Successfully created on the agent"
-   }
-
-Retrive Asset Requests
-~~~~~~~~~~~~~~~~~~~~~~
-
-Retrieve Asset-7992 from Channel C1
-
-::
-
-   curl -f --location --request GET "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7992" 
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "standardVersion": 1,
-       "documentName": "Test Asset 02",
-       "documentCreator": "DBoM Organisation",
-       "documentCreatedDate": "2020-10-01T10:06:47+0000",
-       "assetType": "HardwareComponent",
-       "assetSubType": "SubType1",
-       "assetManufacturer": "DBoM Organisation",
-       "assetModelNumber": "ABCXYZ",
-       "assetDescription": "A DBoM Asset",
-       "assetMetadata": {
-           "aKey": "aValue"
-       },
-       "parentAsset": {
-           "repoID": "",
-           "channelID": "",
-           "assetID": "",
-           "role": "",
-           "subRole": ""
-       },
-       "manufactureSignature": "UNSIGNED(TEST)"
-   }
-
-Update Asset Requests
-~~~~~~~~~~~~~~~~~~~~~
-
-Update Asset-7991 on Channel C1
-
-::
-
-   curl -f --location --request PUT "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7991" \
-   --header 'Content-Type: application/json' \
-   --data-raw '{
-       "standardVersion": 1.0,
-       "documentName": "Test Asset 01 Updated",
-       "documentCreator": "DBoM Organisation",
-       "documentCreatedDate": "2020-10-01T10:06:47+0000",
-       "assetType": "HardwareComponent",
-       "assetSubType": "SubType1",
-       "assetManufacturer": "DBoM Organisation",
-       "assetModelNumber": "ABCXYZ",
-       "assetDescription": "A DBoM Asset",
-       "assetMetadata": {  
-           "aKey": "aValue"
-       },
-       "manufactureSignature": "UNSIGNED(TEST)"
-   }'
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "success":true,
-       "status":"Successfully updated on the agent"
-   }
-
-
-Retrieve Asset-7991 from Channel C1
-
-::
-
-   curl -f --location --request GET "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7991" 
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "standardVersion": 1,
-       "documentName": "Test Asset 01 Updated",
-       "documentCreator": "DBoM Organisation",
-       "documentCreatedDate": "2020-10-01T10:06:47+0000",
-       "assetType": "HardwareComponent",
-       "assetSubType": "SubType1",
-       "assetManufacturer": "DBoM Organisation",
-       "assetModelNumber": "ABCXYZ",
-       "assetDescription": "A DBoM Asset",
-       "assetMetadata": {
-           "aKey": "aValue"
-       },
-       "parentAsset": {
-           "repoID": "",
-           "channelID": "",
-           "assetID": "",
-           "role": "",
-           "subRole": ""
-       },
-       "manufactureSignature": "UNSIGNED(TEST)"
-   }
-
-Attach and Detach Requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
--  Attaching Asset-7992 [Parent] to Asset-7991 [Child]
-
-::
-
-   curl -f --location --request POST "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7992/attach" \
-   --header 'Content-Type: application/json' \
-   --data-raw "{
-      \"role\": \"SomeRole\",
-      \"subRole\": \"SomeSubRole\",
-      \"repoID\": \"DB1\",
-      \"channelID\": \"C1\",
-      \"assetID\": \"Asset-7991\"
-   }"
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "success": true,
-       "status": "Successfully attached on agent"
-   }
-
--  Detaching Asset-7992 [Parent] from Asset-7991 [Child]
-
-::
-
-   curl -f --location --request POST "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7992/detach" \
-   --header 'Content-Type: application/json' \
-   --data-raw "{
-      \"repoID\": \"DB1\",
-      \"channelID\": \"C1\",
-      \"assetID\": \"Asset-7991\"
-   }"
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "success": true,
-       "status": "Successfully detached on agent"
-   }
-
--  Attaching Asset-7991 [Parent] from Asset-7992 [Child]
-
-::
-
-   curl -f --location --request POST "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7991/attach" \
-   --header 'Content-Type: application/json' \
-   --data-raw "{
-      \"role\": \"SomeRole\",
-      \"subRole\": \"SomeSubRole\",
-      \"repoID\": \"DB1\",
-      \"channelID\": \"C1\",
-      \"assetID\": \"Asset-7992\"
-   }"
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "success": true,
-       "status": "Successfully attached on agent"
-   }
-
-Transfer Asset Requests
-~~~~~~~~~~~~~~~~~~~~~~~
-
-
-Transfer Asset Asset-7991 from Channel C1 to Channel C2
-
-::
-
-   curl --location --request POST "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7991/transfer" \
-   --header 'Content-Type: application/json' \
-   --data-raw "{
-      \"transferDescription\": \"transferred\",
-      \"repoID\": \"DB1\",
-      \"channelID\": \"C2\",
-      \"assetID\": \"Asset-7991\"
-   }"
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "success": true,
-       "status": "Successfully transferred asset"
-   }
-
-Audit Trail Requests
-~~~~~~~~~~~~~~~~~~~~~
-
-Channel C1 (pre transfer)
-
-::
-
-   curl -f --location --request GET "http://localhost:3000/api/v1/repo/DB1/chan/C1/asset/Asset-7991/trail"
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "history": [
-           {
-               "_id": "5f7ab8e27ea2709fad6d6183",
-               "channelID": "C1",
-               "eventType": "CREATE",
-               "payload": {
-                   "assetDescription": "A DBoM Asset",
-                   "assetManufacturer": "DBoM Organisation",
-                   "assetMetadata": {
-                       "aKey": "aValue"
-                   },
-                   "assetModelNumber": "ABCXYZ",
-                   "assetSubType": "SubType1",
-                   "assetType": "HardwareComponent",
-                   "documentCreatedDate": "2020-10-01T10:06:47+0000",
-                   "documentCreator": "DBoM Organisation",
-                   "documentName": "Test Asset 01",
-                   "manufactureSignature": "UNSIGNED(TEST)",
-                   "parentAsset": {
-                       "assetID": "",
-                       "channelID": "",
-                       "repoID": "",
-                       "role": "",
-                       "subRole": ""
-                   },
-                   "standardVersion": 1
-               },
-               "resourceID": "Asset-7991",
-               "timestamp": "2020-10-05T06:10:42.159Z"
-           },
-           {
-               "_id": "5f7ab8e87ea27019956d6185",
-               "channelID": "C1",
-               "eventType": "UPDATE",
-               "payload": {
-                   "assetDescription": "A DBoM Asset",
-                   "assetManufacturer": "DBoM Organisation",
-                   "assetMetadata": {
-                       "aKey": "aValue"
-                   },
-                   "assetModelNumber": "ABCXYZ",
-                   "assetSubType": "SubType1",
-                   "assetType": "HardwareComponent",
-                   "documentCreatedDate": "2020-10-01T10:06:47+0000",
-                   "documentCreator": "DBoM Organisation",
-                   "documentName": "Test Asset 01 Updated",
-                   "manufactureSignature": "UNSIGNED(TEST)",
-                   "parentAsset": {
-                       "assetID": "",
-                       "channelID": "",
-                       "repoID": "",
-                       "role": "",
-                       "subRole": ""
-                   },
-                   "standardVersion": 1
-               },
-               "resourceID": "Asset-7991",
-               "timestamp": "2020-10-05T06:10:48.268Z"
-           },
-           {
-               "_id": "5f7ab8ec7ea270a69f6d6187",
-               "channelID": "C1",
-               "eventType": "ATTACH",
-               "payload": {
-                   "assetDescription": "A DBoM Asset",
-                   "assetManufacturer": "DBoM Organisation",
-                   "assetMetadata": {
-                       "aKey": "aValue"
-                   },
-                   "assetModelNumber": "ABCXYZ",
-                   "assetSubType": "SubType1",
-                   "assetType": "HardwareComponent",
-                   "documentCreatedDate": "2020-10-01T10:06:47+0000",
-                   "documentCreator": "DBoM Organisation",
-                   "documentName": "Test Asset 01 Updated",
-                   "manufactureSignature": "UNSIGNED(TEST)",
-                   "parentAsset": {
-                       "assetID": "Asset-7992",
-                       "channelID": "C1",
-                       "repoID": "DB1",
-                       "role": "SomeRole",
-                       "subRole": "SomeSubRole"
-                   },
-                   "standardVersion": 1
-               },
-               "resourceID": "Asset-7991",
-               "timestamp": "2020-10-05T06:10:52.306Z"
-           },
-           {
-               "_id": "5f7ab8ee7ea2705afd6d6189",
-               "channelID": "C1",
-               "eventType": "DETACH",
-               "payload": {
-                   "assetDescription": "A DBoM Asset",
-                   "assetManufacturer": "DBoM Organisation",
-                   "assetMetadata": {
-                       "aKey": "aValue"
-                   },
-                   "assetModelNumber": "ABCXYZ",
-                   "assetSubType": "SubType1",
-                   "assetType": "HardwareComponent",
-                   "documentCreatedDate": "2020-10-01T10:06:47+0000",
-                   "documentCreator": "DBoM Organisation",
-                   "documentName": "Test Asset 01 Updated",
-                   "manufactureSignature": "UNSIGNED(TEST)",
-                   "parentAsset": {
-                       "assetID": "",
-                       "channelID": "",
-                       "repoID": "",
-                       "role": "",
-                       "subRole": ""
-                   },
-                   "standardVersion": 1
-               },
-               "resourceID": "Asset-7991",
-               "timestamp": "2020-10-05T06:10:54.329Z"
-           },
-           {
-               "_id": "5f7ab8f07ea27072ab6d618a",
-               "channelID": "C1",
-               "eventType": "ATTACH",
-               "payload": {
-                   "assetDescription": "A DBoM Asset",
-                   "assetManufacturer": "DBoM Organisation",
-                   "assetMetadata": {
-                       "aKey": "aValue"
-                   },
-                   "assetModelNumber": "ABCXYZ",
-                   "assetSubType": "SubType1",
-                   "assetType": "HardwareComponent",
-                   "attachedChildren": [
-                       {
-                           "assetID": "Asset-7992",
-                           "channelID": "C1",
-                           "repoID": "DB1",
-                           "role": "SomeRole",
-                           "subRole": "SomeSubRole"
-                       }
-                   ],
-                   "documentCreatedDate": "2020-10-01T10:06:47+0000",
-                   "documentCreator": "DBoM Organisation",
-                   "documentName": "Test Asset 01 Updated",
-                   "manufactureSignature": "UNSIGNED(TEST)",
-                   "parentAsset": {
-                       "assetID": "",
-                       "channelID": "",
-                       "repoID": "",
-                       "role": "",
-                       "subRole": ""
-                   },
-                   "standardVersion": 1
-               },
-               "resourceID": "Asset-7991",
-               "timestamp": "2020-10-05T06:10:56.349Z"
-           },
-           {
-               "_id": "5f7ab8f27ea2707a3e6d618c",
-               "channelID": "C1",
-               "eventType": "TRANSFER",
-               "payload": {
-                   "assetDescription": "A DBoM Asset",
-                   "assetManufacturer": "DBoM Organisation",
-                   "assetMetadata": {
-                       "aKey": "aValue"
-                   },
-                   "assetModelNumber": "ABCXYZ",
-                   "assetSubType": "SubType1",
-                   "assetType": "HardwareComponent",
-                   "attachedChildren": [
-                       {
-                           "assetID": "Asset-7992",
-                           "channelID": "C1",
-                           "repoID": "DB1",
-                           "role": "SomeRole",
-                           "subRole": "SomeSubRole"
-                       }
-                   ],
-                   "custodyTransferEvents ": [
-                       {
-                           "destinationAssetID": "Asset-7991",
-                           "destinationChannelID": "C2",
-                           "destinationRepoID": "DB1",
-                           "sourceAssetID": "Asset-7991",
-                           "sourceChannelID": "C1",
-                           "sourceRepoID": "DB1",
-                           "timestamp": "2020-10-05T06:10:58.371Z",
-                           "transferDescription": "transferred"
-                       }
-                   ],
-                   "documentCreatedDate": "2020-10-01T10:06:47+0000",
-                   "documentCreator": "DBoM Organisation",
-                   "documentName": "Test Asset 01 Updated",
-                   "manufactureSignature": "UNSIGNED(TEST)",
-                   "parentAsset": {
-                       "assetID": "",
-                       "channelID": "",
-                       "repoID": "",
-                       "role": "",
-                       "subRole": ""
-                   },
-                   "readOnly": true,
-                   "standardVersion": 1
-               },
-               "resourceID": "Asset-7991",
-               "timestamp": "2020-10-05T06:10:58.373Z"
-           }
-       ]
-   }
-
-Asset Export Requests
-~~~~~~~~~~~~~~~~~~~~~
-
-Export asset graph from Asset-7991, now transferred to C2
-
-::
-
-   curl -f --location --request GET "http://localhost:3000/api/v1/repo/DB1/chan/C2/asset/Asset-7991/export"
-
-**Output:**
-
-.. code-block:: json
-
-   {
-       "Asset-7991": {
-           "standardVersion": 1,
-           "documentName": "Test Asset 01 Updated",
-           "documentCreator": "DBoM Organisation",
-           "documentCreatedDate": "2020-10-01T10:06:47+0000",
-           "assetType": "HardwareComponent",
-           "assetSubType": "SubType1",
-           "assetManufacturer": "DBoM Organisation",
-           "assetModelNumber": "ABCXYZ",
-           "assetDescription": "A DBoM Asset",
-           "assetMetadata": {
-               "aKey": "aValue"
-           },
-           "custodyTransferEvents ": [
+   
+   [
+      {
+         "id": "64ddd903ef1537048d1f6437",
+         "nodeId": "node1",
+         "publicKeys": [],
+         "nodeConnections": [
                {
-                   "timestamp": "2020-10-05T06:10:58.371Z",
-                   "transferDescription": "transferred",
-                   "sourceRepoID": "DB1",
-                   "sourceChannelID": "C1",
-                   "sourceAssetID": "Asset-7991",
-                   "destinationRepoID": "DB1",
-                   "destinationChannelID": "C2",
-                   "destinationAssetID": "Asset-7991"
+                  "nodeId": "node2",
+                  "status": "FEDERATION_SUCCESS",
+                  "channelConnections": [
+                     {
+                           "channelId": "channel1",
+                           "status": "CONNECTED",
+                           "access": "READ"
+                     },
+                     {
+                           "channelId": "channel1",
+                           "status": "REQUEST_ACCEPTED",
+                           "access": "READ"
+                     }
+                  ]
                }
-           ],
-           "manufactureSignature": "UNSIGNED(TEST)",
-           "children": {
-               "Asset-7992": {
-                   "standardVersion": 1,
-                   "documentName": "Test Asset 02",
-                   "documentCreator": "DBoM Organisation",
-                   "documentCreatedDate": "2020-10-01T10:06:47+0000",
-                   "assetType": "HardwareComponent",
-                   "assetSubType": "SubType1",
-                   "assetManufacturer": "DBoM Organisation",
-                   "assetModelNumber": "ABCXYZ",
-                   "assetDescription": "A DBoM Asset",
-                   "assetMetadata": {
-                       "aKey": "aValue"
-                   },
-                   "manufactureSignature": "UNSIGNED(TEST)"
+         ],
+         "createdAt": "2023-08-17T08:23:31.695Z",
+         "modifiedAt": "2023-08-17T08:28:21.234Z"
+      }
+   ]
+
+
+Channel Requests
+~~~~~~~~~~~~~~~~
+
+**Create Channel1 on Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/channels' \
+   --header 'Content-Type: application/json' \
+   --header 'Accept: application/json' \
+   --data '{
+      "channelId": "channel1",
+      "description": "Channel1 of Node 1",
+      "type": "TEST_CHANNEL",
+      "notaries": [
+         {
+               "id": "ahgsduih",
+               "type": "SIGNED",
+               "config": {}
+         }
+      ]
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+    "success": true,
+    "status": "Successfully sent request to create channel"
+   }
+
+**List all Channels on Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/channels' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+   
+   [
+      {
+         "channelId": "channel1",
+         "description": "Channel1 of Node 1",
+         "type": "TEST_CHANNEL",
+         "notaries": [
+               {
+                  "id": "ahgsduih",
+                  "type": "SIGNED",
+                  "config": {}
                }
-           }
-       }
+         ],
+         "createdAt": "2023-08-17T08:26:45.133Z",
+         "modifiedAt": "2023-08-17T08:26:45.133Z"
+      }
+   ]
+
+
+**List Channel1 on Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3051/api/v2/nodes/node1.test.com/channels/channel1' \
+   --header 'Accept: application/json'
+Output:
+
+.. code-block:: json
+   
+   [
+      {
+         "channelId": "channel1",
+         "description": "Channel1 of Node 1",
+         "type": "TEST_CHANNEL",
+         "notaries": [
+               {
+                  "id": "ahgsduih",
+                  "type": "SIGNED",
+                  "config": {}
+               }
+         ],
+         "createdAt": "2023-08-17T08:26:45.133Z",
+         "modifiedAt": "2023-08-17T08:26:45.133Z"
+      }
+   ]
+
+**Add a notary to a Channel1 on Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location --request PUT 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/notary' \
+   --header 'Content-Type: application/json' \
+   --header 'Accept: application/json' \
+   --data '{
+   "notaryId": "notary-sample"
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully sent request to update notary details to a channel"
+   }
+
+**Remove a notary from a Channel1 on Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location --request DELETE 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/notary/notary-sample' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully sent request to delete notary details from a channel"
+   }
+
+Asset Requests
+~~~~~~~~~~~~~~
+
+**Create Asset1 on Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curlcurl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/asset1' \
+   --header 'Content-Type: application/json' \
+   --header 'Accept: application/json' \
+   --data '{
+      "standardVersion": 1,
+      "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+      "createdAt": "2023-05-15T12:34:56Z",
+      "modifiedAt": "2023-05-15T12:34:56Z",
+      "notarizations": [
+         {
+               "notaryId": "not1",
+               "notaryMeta": {}
+         }
+      ],
+      "links": [
+         {
+               "assetUri": "string",
+               "type": "asset",
+               "comment": "example2",
+               "id": "link1"
+         }
+      ],
+      "signatures": [
+         {
+               "hashType": "SHA256",
+               "signType": "type1",
+               "signMeta": {
+                  "authority": "user1",
+                  "keyId": "12345",
+                  "sign": "asdfbiuvagebvbayerfasdfbsjasdfdliufgalsi"
+               }
+         }
+      ],
+      "body": {}
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully sent request to create asset"
    }
 
 
-==========
-Kubernetes
-==========
+**List Assets on Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets' \
+   --header 'Content-Type: application/json' \
+   --header 'Accept: application/json' \
+   --data ''
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "channelId": "channel1",
+         "assetId": "asset1",
+         "payload": {
+               "standardVersion": 1,
+               "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+               "createdAt": "2023-05-15T12:34:56Z",
+               "modifiedAt": "2023-05-15T12:34:56Z",
+               "notarizations": [
+                  {
+                     "notaryId": "not1",
+                     "notaryMeta": {}
+                  }
+               ],
+               "links": [
+                  {
+                     "assetUri": "string",
+                     "type": "asset",
+                     "comment": "example2",
+                     "id": "link1"
+                  }
+               ],
+               "signatures": [
+                  {
+                     "hashType": "SHA256",
+                     "signType": "type1",
+                     "signMeta": {
+                           "authority": "user1",
+                           "keyId": "12345",
+                           "sign": "asdfbiuvagebvbayerfasdfbsjasdfdliufgalsi"
+                     }
+                  }
+               ],
+               "body": {}
+         }
+      }
+   ]
 
 
-Learn how to deploy each service using helm using the READMEs provided in the `deployments repository <https://github.com/DBOMproject/deployments>`__
+**List Asset1 on Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/asset1' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "channelId": "channel1",
+         "assetId": "asset1",
+         "payload": {
+               "standardVersion": 1,
+               "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+               "createdAt": "2023-05-15T12:34:56Z",
+               "modifiedAt": "2023-05-15T12:34:56Z",
+               "notarizations": [
+                  {
+                     "notaryId": "not1",
+                     "notaryMeta": {}
+                  }
+               ],
+               "links": [
+                  {
+                     "assetUri": "string",
+                     "type": "asset",
+                     "comment": "example2",
+                     "id": "link1"
+                  }
+               ],
+               "signatures": [
+                  {
+                     "hashType": "SHA256",
+                     "signType": "type1",
+                     "signMeta": {
+                           "authority": "user1",
+                           "keyId": "12345",
+                           "sign": "asdfbiuvagebvbayerfasdfbsjasdfdliufgalsi"
+                     }
+                  }
+               ],
+               "body": {}
+         }
+      }
+   ]
+
+
+**Update Asset1 on Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location --request PUT 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/asset1' \
+   --header 'Content-Type: application/json' \
+   --data '{
+      "standardVersion": 1,
+      "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+      "createdAt": "2023-05-15T12:34:56Z",
+      "modifiedAt": "2023-05-15T12:34:56Z",
+      "notarizations": [
+         {
+               "notaryId": "not1",
+               "notaryMeta": {}
+         },
+         {
+               "notaryId": "not2",
+               "notaryMeta": {}
+         }
+      ],
+      "links": [
+         {
+               "assetUri": "string",
+               "type": "asset",
+               "comment": "example2",
+               "id": "id4"
+         }
+      ],
+      "signatures": [
+         {
+               "hashType": "SHA256",
+               "signType": "type1",
+               "signMeta": {
+                  "authority": "user1",
+                  "keyId": "12345",
+                  "sign": "Xdjfgfn"
+               }
+         }
+      ],
+      "body": {}
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully sent request to update asset"
+   }
+
+
+**[WIP] Rich Query Assets in Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+ curl --location --globoff 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/_query?query={}&fields=[]&limit=1&skip=0'
+
+.. note::
+   Refer postman API collation for more details on query.
+
+
+.. Output:
+
+.. .. code-block:: json
+
+..    {
+      
+..    }
+
+
+**Query Assets in Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/_query' \
+   --header 'Content-Type: application/json' \
+   --data '{
+      "where": {
+         "assetId": {
+               "equals": "asset1"
+         }
+      }
+   }'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "channelId": "channel1",
+         "assetId": "asset1",
+         "payload": {
+               "standardVersion": 1,
+               "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+               "createdAt": "2023-05-15T12:34:56Z",
+               "modifiedAt": "2023-05-15T12:34:56Z",
+               "notarizations": [
+                  {
+                     "notaryId": "not1",
+                     "notaryMeta": {}
+                  },
+                  {
+                     "notaryId": "not2",
+                     "notaryMeta": {}
+                  }
+               ],
+               "links": [
+                  {
+                     "assetUri": "string",
+                     "type": "asset",
+                     "comment": "example2",
+                     "id": "id4"
+                  }
+               ],
+               "signatures": [
+                  {
+                     "hashType": "SHA256",
+                     "signType": "type1",
+                     "signMeta": {
+                           "authority": "user1",
+                           "keyId": "12345",
+                           "sign": "Xdjfgfn"
+                     }
+                  }
+               ],
+               "body": {}
+         }
+      }
+   ]
+
+**Audit Trail of Asset1 in Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.example.com/channels/channel1/assets/asset1/audit-trail' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "id": "64ddd9d4ef1537048d1f643a",
+         "channelId": "channel1",
+         "assetId": "asset1",
+         "action": "CREATE",
+         "payload": {
+               "assetId": "asset1",
+               "channelId": "channel1",
+               "createdAt": "2023-08-17T08:27:00.909Z",
+               "id": "64ddd9d4ef1537048d1f6439",
+               "modifiedAt": "2023-08-17T08:27:00.909Z",
+               "payload": {
+                  "body": {},
+                  "createdAt": "2023-05-15T12:34:56Z",
+                  "links": [
+                     {
+                           "assetUri": "string",
+                           "comment": "example2",
+                           "id": "link1",
+                           "type": "asset"
+                     }
+                  ],
+                  "modifiedAt": "2023-05-15T12:34:56Z",
+                  "notarizations": [
+                     {
+                           "notaryId": "not1",
+                           "notaryMeta": {}
+                     }
+                  ],
+                  "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+                  "signatures": [
+                     {
+                           "hashType": "SHA256",
+                           "signMeta": {
+                              "authority": "user1",
+                              "keyId": "12345",
+                              "sign": "asdfbiuvagebvbayerfasdfbsjasdfdliufgalsi"
+                           },
+                           "signType": "type1"
+                     }
+                  ],
+                  "standardVersion": 1
+               }
+         },
+         "timestamp": "2023-08-17T08:27:00.914Z"
+      },
+      {
+         "id": "64ddf2c6b7b6a73ae0cd6ead",
+         "channelId": "channel1",
+         "assetId": "asset1",
+         "action": "UPDATE",
+         "payload": {
+               "body": {},
+               "createdAt": "2023-05-15T12:34:56Z",
+               "links": [
+                  {
+                     "assetUri": "string",
+                     "comment": "example2",
+                     "id": "id4",
+                     "type": "asset"
+                  }
+               ],
+               "modifiedAt": "2023-05-15T12:34:56Z",
+               "notarizations": [
+                  {
+                     "notaryId": "not1",
+                     "notaryMeta": {}
+                  },
+                  {
+                     "notaryId": "not2",
+                     "notaryMeta": {}
+                  }
+               ],
+               "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+               "signatures": [
+                  {
+                     "hashType": "SHA256",
+                     "signMeta": {
+                           "authority": "user1",
+                           "keyId": "12345",
+                           "sign": "Xdjfgfn"
+                     },
+                     "signType": "type1"
+                  }
+               ],
+               "standardVersion": 1
+         },
+         "timestamp": "2023-08-17T10:13:26.357Z"
+      },
+      {
+         "id": "64ddf4efb7b6a73ae0cd6eae",
+         "channelId": "channel1",
+         "assetId": "asset1",
+         "action": "LINK",
+         "payload": {
+               "assetId": "asset1",
+               "channelId": "channel1",
+               "createdAt": "2023-08-17T08:27:00.909Z",
+               "id": "64ddd9d4ef1537048d1f6439",
+               "modifiedAt": "2023-08-17T10:22:39.313Z",
+               "payload": {
+                  "body": {},
+                  "createdAt": "2023-05-15T12:34:56Z",
+                  "links": [
+                     {
+                           "assetUri": "string",
+                           "comment": "example2",
+                           "id": "id4",
+                           "type": "asset"
+                     },
+                     {
+                           "assetUri": "reprehenderit qui culpa deserunt velit",
+                           "comment": "si",
+                           "id": "link2",
+                           "type": "amet dolore enim velit"
+                     }
+                  ],
+                  "modifiedAt": "2023-05-15T12:34:56Z",
+                  "notarizations": [
+                     {
+                           "notaryId": "not1",
+                           "notaryMeta": {}
+                     },
+                     {
+                           "notaryId": "not2",
+                           "notaryMeta": {}
+                     }
+                  ],
+                  "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+                  "signatures": [
+                     {
+                           "hashType": "SHA256",
+                           "signMeta": {
+                              "authority": "user1",
+                              "keyId": "12345",
+                              "sign": "Xdjfgfn"
+                           },
+                           "signType": "type1"
+                     }
+                  ],
+                  "standardVersion": 1
+               }
+         },
+         "timestamp": "2023-08-17T10:22:39.325Z"
+      }
+   ]
+
+**Add Link1 to Asset1 in Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.example.com/channels/channel1/assets/asset1/links' \
+   --header 'Content-Type: application/json' \
+   --data '{
+   "assetUri": "reprehenderit qui culpa deserunt velit",
+   "type": "amet dolore enim velit",
+   "comment": "si",
+   "id": "link2"
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully sent request to link asset"
+   }
+
+
+**Remove Link1 to Asset1 in Channel1 of Node1**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location --request DELETE 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/asset1/links/link2'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully sent request to unlink asset"
+   }
+
+Federation Requests
+~~~~~~~~~~~~~~~~~~~
+
+.. note:: 
+    **Requires another running DBoM node to work**. Below requests and responses work when Node2 is running with respective channels associated with it. 
+
+**Access Channel2 of Node2 on Node1 (Initiates Channel Join Request)**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node2.test.com/channels/channel2' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "status": "Successfully sent federation request",
+      "success": true
+   }
+
+**Check Channel Join Request Status in Node1 Metadata**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node1.test.com/_metadata' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "id": "64ddd903ef1537048d1f6437",
+         "nodeId": "node1",
+         "publicKeys": [],
+         "nodeConnections": [
+               {
+                  "nodeId": "node2",
+                  "status": "FEDERATION_SUCCESS",
+                  "channelConnections": [
+                     {
+                           "channelId": "channel1",
+                           "status": "CONNECTED",
+                           "access": "READ"
+                     },
+                     {
+                           "channelId": "channel1",
+                           "status": "REQUEST_ACCEPTED",
+                           "access": "READ"
+                     }
+                  ]
+               }
+         ],
+         "createdAt": "2023-08-17T08:23:31.695Z",
+         "modifiedAt": "2023-08-17T08:28:21.234Z"
+      }
+   ]
+
+
+**Check Channel Join Request Status in Node1 Metadata**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3051/api/v2/nodes/node2.test.com/_metadata' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "id": "64ddd9039ddeb7835e1bc976",
+         "nodeId": "node2",
+         "publicKeys": [],
+         "nodeConnections": [
+               {
+                  "nodeId": "node1",
+                  "status": "FEDERATION_SUCCESS",
+                  "channelConnections": [
+                     {
+                           "channelId": "channel1",
+                           "status": "REQUEST_ACCEPTED",
+                           "access": "READ"
+                     },
+                     {
+                           "channelId": "channel1",
+                           "status": "CONNECTED",
+                           "access": "READ"
+                     },
+                     {
+                           "channelId": "channel2",
+                           "status": "RECEIVED_CONNECTION_REQUEST",
+                           "access": "READ"
+                     }
+                  ]
+               }
+         ],
+         "createdAt": "2023-08-17T08:23:31.357Z",
+         "modifiedAt": "2023-08-17T10:39:39.158Z"
+      }
+   ]
+
+**Check Requests on Node2**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3051/api/v2/federation/requests/all'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "requestId": "64ddd9f39ddeb7835e1bc97d",
+         "nodeUri": "node1.test.com",
+         "nodeId": "node1",
+         "channelId": "channel1",
+         "status": "REQUEST_ACCEPTED",
+         "createdAt": "2023-08-17T08:27:31.844Z",
+         "modifiedAt": "2023-08-17T08:28:16.189Z"
+      },
+      {
+         "requestId": "64ddf8eba4acb883b830ad7d",
+         "nodeUri": "node1.test.com",
+         "nodeId": "node1",
+         "channelId": "channel2",
+         "status": "AWAITING_ACTION",
+         "createdAt": "2023-08-17T10:39:39.184Z",
+         "modifiedAt": "2023-08-17T10:39:39.184Z"
+      }
+   ]
+
+**Check specific Request on Node2 with RequestId**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3051/api/v2/federation/requests/64ddf8eba4acb883b830ad7d'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "requestId": "64ddf8eba4acb883b830ad7d",
+         "nodeUri": "node1.test.com",
+         "nodeId": "node1",
+         "channelId": "channel2",
+         "status": "AWAITING_ACTION",
+         "createdAt": "2023-08-17T10:39:39.184Z",
+         "modifiedAt": "2023-08-17T10:39:39.184Z"
+      }
+   ]
+
+
+**Accept Channel1 Access request on Node2**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3051/api/v2/federation/requests/64ddf8eba4acb883b830ad7d/accept' \
+   --header 'Content-Type: application/json' \
+   --data '{
+      "type": "ACCEPT"
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully accepted federation request"
+   }
+
+**Reject Channel1 Access request on Node2**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3051/api/v2/federation/requests/64ddf8eba4acb883b830ad7d/reject' \
+   --header 'Content-Type: application/json' \
+   --data '{
+      "type": "REJECT"
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully rejected federation request"
+   }
+
+**Revoke Channel1 Access request on Node2**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/federation/revoke' \
+   --header 'Content-Type: application/json' \
+   --data '{
+      "nodeUri": "node2.test.com",
+      "nodeId": "node2",
+      "channelId": "channel2",
+      "type": "REVOKE"
+   }'
+
+Output:
+
+.. code-block:: json
+
+   {
+      "success": true,
+      "status": "Successfully sent revoke request"
+   }
+
+**Access Channel1 of Node2 on Node1 (After Channel Join Request is accepted)**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node2.test.com/channels/channel2' \
+   --header 'Accept: application/json'
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "channelId": "channel2",
+         "description": "Channel2 of Node 2 - Remote",
+         "type": "TEST_CHANNEL",
+         "notaries": [
+               {
+                  "id": "ahgsduih",
+                  "type": "SIGNED",
+                  "config": {}
+               }
+         ],
+         "createdAt": "2023-08-17T08:26:55.626Z",
+         "modifiedAt": "2023-08-17T08:26:55.626Z"
+      }
+   ]
+
+**Access Assets of Channel1 of Node2 from Node1 (After Channel Join Request is accepted)**
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. code-block:: shell
+
+   curl --location 'http://localhost:3050/api/v2/nodes/node2.test.com/channels/channel1/assets' \
+   --header 'Content-Type: application/json' \
+   --header 'Accept: application/json' \
+   --data ''
+
+Output:
+
+.. code-block:: json
+
+   [
+      {
+         "channelId": "channel1",
+         "assetId": "asset1",
+         "payload": {
+               "standardVersion": 1,
+               "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+               "createdAt": "2023-05-15T12:34:56Z",
+               "modifiedAt": "2023-05-15T12:34:56Z",
+               "notarizations": [
+                  {
+                     "notaryId": "not1",
+                     "notaryMeta": {}
+                  }
+               ],
+               "links": [
+                  {
+                     "assetUri": "string",
+                     "type": "asset",
+                     "comment": "example2",
+                     "id": "link1"
+                  }
+               ],
+               "signatures": [
+                  {
+                     "hashType": "SHA256",
+                     "signType": "type1",
+                     "signMeta": {
+                           "authority": "user1",
+                           "keyId": "12345",
+                           "sign": "asdfbiuvagebvbayerfasdfbsjasdfdliufgalsi"
+                     }
+                  }
+               ],
+               "body": {}
+         }
+      }
+   ]
+
+
+================
+[WIP] Kubernetes
+================
+
+Work in progress. 
+
+.. Learn how to deploy each service using helm using the READMEs provided in the `deployments repository <https://github.com/DBOMproject/deployments>`__
