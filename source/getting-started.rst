@@ -769,7 +769,7 @@ Federation Requests
 
 .. code-block:: shell
 
-   curl --location 'http://localhost:3050/api/v2/nodes/node2.test.com/channels/channel2' \
+   curl --location 'http://localhost:3050/api/v2/nodes/node2.test.com/channels/channel1' \
    --header 'Accept: application/json'
 
 Output:
@@ -805,12 +805,7 @@ Output:
                   "channelConnections": [
                      {
                            "channelId": "channel1",
-                           "status": "CONNECTED",
-                           "access": "READ"
-                     },
-                     {
-                           "channelId": "channel1",
-                           "status": "REQUEST_ACCEPTED",
+                           "status": "SENT_CONNECTION_REQUEST",
                            "access": "READ"
                      }
                   ]
@@ -846,16 +841,6 @@ Output:
                   "channelConnections": [
                      {
                            "channelId": "channel1",
-                           "status": "REQUEST_ACCEPTED",
-                           "access": "READ"
-                     },
-                     {
-                           "channelId": "channel1",
-                           "status": "CONNECTED",
-                           "access": "READ"
-                     },
-                     {
-                           "channelId": "channel2",
                            "status": "RECEIVED_CONNECTION_REQUEST",
                            "access": "READ"
                      }
@@ -880,19 +865,10 @@ Output:
 
    [
       {
-         "requestId": "64ddd9f39ddeb7835e1bc97d",
-         "nodeUri": "node1.test.com",
-         "nodeId": "node1",
-         "channelId": "channel1",
-         "status": "REQUEST_ACCEPTED",
-         "createdAt": "2023-08-17T08:27:31.844Z",
-         "modifiedAt": "2023-08-17T08:28:16.189Z"
-      },
-      {
          "requestId": "64ddf8eba4acb883b830ad7d",
          "nodeUri": "node1.test.com",
          "nodeId": "node1",
-         "channelId": "channel2",
+         "channelId": "channel1",
          "status": "AWAITING_ACTION",
          "createdAt": "2023-08-17T10:39:39.184Z",
          "modifiedAt": "2023-08-17T10:39:39.184Z"
@@ -915,7 +891,7 @@ Output:
          "requestId": "64ddf8eba4acb883b830ad7d",
          "nodeUri": "node1.test.com",
          "nodeId": "node1",
-         "channelId": "channel2",
+         "channelId": "channel1",
          "status": "AWAITING_ACTION",
          "createdAt": "2023-08-17T10:39:39.184Z",
          "modifiedAt": "2023-08-17T10:39:39.184Z"
@@ -991,7 +967,7 @@ Output:
 
 .. code-block:: shell
 
-   curl --location 'http://localhost:3050/api/v2/nodes/node2.test.com/channels/channel2' \
+   curl --location 'http://localhost:3050/api/v2/nodes/node2.test.com/channels/channel1' \
    --header 'Accept: application/json'
 
 Output:
@@ -1000,8 +976,8 @@ Output:
 
    [
       {
-         "channelId": "channel2",
-         "description": "Channel2 of Node 2 - Remote",
+         "channelId": "channel1",
+         "description": "Channel1 of Node 2 - Remote",
          "type": "TEST_CHANNEL",
          "notaries": [
                {
