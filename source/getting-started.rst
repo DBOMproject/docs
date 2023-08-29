@@ -54,7 +54,7 @@ Launch the network using docker-compose
 
    # Generate certificates
    # node1.test.com - should be same as your container/node name
-   docker compose -f docker-compose-certs.yml  run --rm certificate_generator ./Generator node1.test.com
+   docker compose -f docker-compose-certs.yml run --rm certificate_generator ./Generator node1.test.com
 
    # Run all the services
    docker compose up -d
