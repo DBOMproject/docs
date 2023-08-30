@@ -84,6 +84,20 @@ With the containers started, next, test the APIs by executing the script *testAP
 
    ./testAPIs.sh
 
+Stopping docker containers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: shell
+
+   # To stop the docker containers, also deletes volumes
+   docker compose down
+
+   # To stop the docker containers, also deletes volumes
+   docker compose down -v
+
+   # To stop the docker containers, also deletes images and volumes
+   docker compose down --rmi all -v
+
 
 Sample REST API Requests
 ------------------------
