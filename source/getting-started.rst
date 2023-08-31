@@ -89,7 +89,7 @@ Stopping docker containers
 
 .. code-block:: shell
 
-   # To stop the docker containers, also deletes volumes
+   # To stop the docker containers
    docker compose down
 
    # To stop the docker containers, also deletes volumes
