@@ -877,17 +877,20 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "requestId": "64ddf8eba4acb883b830ad7d",
-         "nodeUri": "node1.test.com",
-         "nodeId": "node1",
-         "channelId": "channel1",
-         "status": "AWAITING_ACTION",
-         "createdAt": "2023-08-17T10:39:39.184Z",
-         "modifiedAt": "2023-08-17T10:39:39.184Z"
-      }
-   ]
+   {
+      "success": true,
+      "result": [
+         {
+            "requestId": "64ddf8eba4acb883b830ad7d",
+            "nodeUri": "node1.test.com",
+            "nodeId": "node1",
+            "channelId": "channel1",
+            "status": "AWAITING_ACTION",
+            "createdAt": "2023-08-17T10:39:39.184Z",
+            "modifiedAt": "2023-08-17T10:39:39.184Z"
+         }
+      ]
+   }
 
 **Check specific Request on Node2 with RequestId**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -900,17 +903,20 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "requestId": "64ddf8eba4acb883b830ad7d",
-         "nodeUri": "node1.test.com",
-         "nodeId": "node1",
-         "channelId": "channel1",
-         "status": "AWAITING_ACTION",
-         "createdAt": "2023-08-17T10:39:39.184Z",
-         "modifiedAt": "2023-08-17T10:39:39.184Z"
-      }
-   ]
+   {
+      "success": true,
+      "result": [
+         {
+            "requestId": "64ddf8eba4acb883b830ad7d",
+            "nodeUri": "node1.test.com",
+            "nodeId": "node1",
+            "channelId": "channel1",
+            "status": "AWAITING_ACTION",
+            "createdAt": "2023-08-17T10:39:39.184Z",
+            "modifiedAt": "2023-08-17T10:39:39.184Z"
+         }
+      ]
+   }
 
 
 **Accept Channel1 Access request on Node2**
