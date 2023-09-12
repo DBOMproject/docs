@@ -12,7 +12,7 @@ This tutorial will describe how to get started with the digital bill of material
 -  database-agent
 -  nats
 -  mongodb (local - with prisma)
-
+-  notary-agent (local - basic implementation)
 
 Once these containers are running, the DBoM gateway (chainsource-gateway) provides a REST interface with the APIs as described in the `API Specs <https://github.com/DBOMproject/api-specs/tree/2.0.0-alpha-1>`__ 
 
@@ -117,33 +117,36 @@ Output:
 
 .. code-block:: json
    
-   [
-      {
-         "id": "64ddd903ef1537048d1f6437",
-         "nodeId": "node1",
-         "publicKeys": [],
-         "nodeConnections": [
-               {
-                  "nodeId": "node2",
-                  "status": "FEDERATION_SUCCESS",
-                  "channelConnections": [
-                     {
+   {
+      "success": true,
+      "result": [
+         {
+            "id": "64ddd903ef1537048d1f6437",
+            "nodeId": "node1",
+            "publicKeys": [],
+            "nodeConnections": [
+                  {
+                     "nodeId": "node2",
+                     "status": "FEDERATION_SUCCESS",
+                     "channelConnections": [
+                        {
                            "channelId": "channel1",
                            "status": "CONNECTED",
                            "access": "READ"
-                     },
-                     {
+                        },
+                        {
                            "channelId": "channel1",
                            "status": "REQUEST_ACCEPTED",
                            "access": "READ"
-                     }
-                  ]
-               }
-         ],
-         "createdAt": "2023-08-17T08:23:31.695Z",
-         "modifiedAt": "2023-08-17T08:28:21.234Z"
-      }
-   ]
+                        }
+                     ]
+                  }
+            ],
+            "createdAt": "2023-08-17T08:23:31.695Z",
+            "modifiedAt": "2023-08-17T08:28:21.234Z"
+         }
+      ]
+   }
 
 
 Channel Requests
@@ -161,13 +164,7 @@ Channel Requests
       "channelId": "channel1",
       "description": "Channel1 of Node 1",
       "type": "TEST_CHANNEL",
-      "notaries": [
-         {
-               "id": "ahgsduih",
-               "type": "SIGNED",
-               "config": {}
-         }
-      ]
+      "notaries": []
    }'
 
 Output:
@@ -175,8 +172,8 @@ Output:
 .. code-block:: json
 
    {
-    "success": true,
-    "status": "Successfully sent request to create channel"
+      "success": true,
+      "status": "successfully created channel"
    }
 
 **List all Channels on Node1**
@@ -191,22 +188,19 @@ Output:
 
 .. code-block:: json
    
-   [
-      {
-         "channelId": "channel1",
-         "description": "Channel1 of Node 1",
-         "type": "TEST_CHANNEL",
-         "notaries": [
-               {
-                  "id": "ahgsduih",
-                  "type": "SIGNED",
-                  "config": {}
-               }
-         ],
-         "createdAt": "2023-08-17T08:26:45.133Z",
-         "modifiedAt": "2023-08-17T08:26:45.133Z"
-      }
-   ]
+   {
+      "success": true,
+      "result": [
+         {
+            "channelId": "channel1",
+            "description": "Channel1 of Node 1",
+            "type": "TEST_CHANNEL",
+            "notaries": [],
+            "createdAt": "2023-08-17T08:26:45.133Z",
+            "modifiedAt": "2023-08-17T08:26:45.133Z"
+         }
+      ]
+   }
 
 
 **List Channel1 on Node1**
@@ -221,22 +215,19 @@ Output:
 
 .. code-block:: json
    
-   [
-      {
-         "channelId": "channel1",
-         "description": "Channel1 of Node 1",
-         "type": "TEST_CHANNEL",
-         "notaries": [
-               {
-                  "id": "ahgsduih",
-                  "type": "SIGNED",
-                  "config": {}
-               }
-         ],
-         "createdAt": "2023-08-17T08:26:45.133Z",
-         "modifiedAt": "2023-08-17T08:26:45.133Z"
-      }
-   ]
+   {
+      "success": true,
+      "result": [
+         {
+            "channelId": "channel1",
+            "description": "Channel1 of Node 1",
+            "type": "TEST_CHANNEL",
+            "notaries": [],
+            "createdAt": "2023-08-17T08:26:45.133Z",
+            "modifiedAt": "2023-08-17T08:26:45.133Z"
+         }
+      ]
+   }
 
 **Add a notary to a Channel1 on Node1**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -256,7 +247,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully sent request to update notary details to a channel"
+      "status": "successfully updated channel notary"
    }
 
 **Remove a notary from a Channel1 on Node1**
@@ -273,7 +264,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully sent request to delete notary details from a channel"
+      "status": "successfully removed channel notary"
    }
 
 Asset Requests
@@ -326,7 +317,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully sent request to create asset"
+      "status": "successfully created asset"
    }
 
 
@@ -344,11 +335,13 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "channelId": "channel1",
-         "assetId": "asset1",
-         "payload": {
+   {
+      "success": true,
+      "result": [
+         {
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "payload": {
                "standardVersion": 1,
                "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
                "createdAt": "2023-05-15T12:34:56Z",
@@ -379,9 +372,10 @@ Output:
                   }
                ],
                "body": {}
+            }
          }
-      }
-   ]
+      ]
+   }
 
 
 **List Asset1 on Channel1 of Node1**
@@ -396,11 +390,13 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "channelId": "channel1",
-         "assetId": "asset1",
-         "payload": {
+   {
+      "success": true,
+      "result": [
+         {
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "payload": {
                "standardVersion": 1,
                "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
                "createdAt": "2023-05-15T12:34:56Z",
@@ -431,9 +427,10 @@ Output:
                   }
                ],
                "body": {}
+            }
          }
-      }
-   ]
+      ]
+   }
 
 
 **Update Asset1 on Channel1 of Node1**
@@ -486,28 +483,70 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully sent request to update asset"
+      "status": "successfully updated asset"
    }
 
 
-**[WIP] Rich Query Assets in Channel1 of Node1**
+** Rich Query Assets in Channel1 of Node1**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
- curl --location --globoff 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/_query?query={}&fields=[]&limit=1&skip=0'
+ curl --location --globoff 'http://localhost:3050/api/v2/nodes/node1.test.com/channels/channel1/assets/_query?query={%20}&fields=[]&limit=1&skip=0'
 
 .. note::
    Refer postman API collation for more details on query.
 
 
-.. Output:
+Output:
 
-.. .. code-block:: json
+.. code-block:: json
 
-..    {
-      
-..    }
+   {
+      "success": true,
+      "result": [
+         {
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "payload": {
+               "standardVersion": 1,
+               "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
+               "createdAt": "2023-05-15T12:34:56Z",
+               "modifiedAt": "2023-05-15T12:34:56Z",
+               "notarizations": [
+                  {
+                     "notaryId": "not1",
+                     "notaryMeta": {}
+                  },
+                  {
+                     "notaryId": "not2",
+                     "notaryMeta": {}
+                  }
+               ],
+               "links": [
+                  {
+                     "assetUri": "string",
+                     "type": "asset",
+                     "comment": "example2",
+                     "id": "id4"
+                  }
+               ],
+               "signatures": [
+                  {
+                     "hashType": "SHA256",
+                     "signType": "type1",
+                     "signMeta": {
+                        "authority": "user1",
+                        "keyId": "12345",
+                        "sign": "Xdjfgfn"
+                     }
+                  }
+               ],
+               "body": {}
+            }
+         }
+      ]
+   }
 
 
 **Query Assets in Channel1 of Node1**
@@ -529,11 +568,13 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "channelId": "channel1",
-         "assetId": "asset1",
-         "payload": {
+   {
+      "success": true,
+      "result": [
+         {
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "payload": {
                "standardVersion": 1,
                "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
                "createdAt": "2023-05-15T12:34:56Z",
@@ -568,9 +609,10 @@ Output:
                   }
                ],
                "body": {}
+            }
          }
-      }
-   ]
+      ]
+   }
 
 **Audit Trail of Asset1 in Channel1 of Node1**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -584,13 +626,15 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "id": "64ddd9d4ef1537048d1f643a",
-         "channelId": "channel1",
-         "assetId": "asset1",
-         "action": "CREATE",
-         "payload": {
+   {
+      "success": true,
+      "result": [
+         {
+            "id": "64ddd9d4ef1537048d1f643a",
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "action": "CREATE",
+            "payload": {
                "assetId": "asset1",
                "channelId": "channel1",
                "createdAt": "2023-08-17T08:27:00.909Z",
@@ -628,15 +672,15 @@ Output:
                   ],
                   "standardVersion": 1
                }
+            },
+            "timestamp": "2023-08-17T08:27:00.914Z"
          },
-         "timestamp": "2023-08-17T08:27:00.914Z"
-      },
-      {
-         "id": "64ddf2c6b7b6a73ae0cd6ead",
-         "channelId": "channel1",
-         "assetId": "asset1",
-         "action": "UPDATE",
-         "payload": {
+         {
+            "id": "64ddf2c6b7b6a73ae0cd6ead",
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "action": "UPDATE",
+            "payload": {
                "body": {},
                "createdAt": "2023-05-15T12:34:56Z",
                "links": [
@@ -671,15 +715,15 @@ Output:
                   }
                ],
                "standardVersion": 1
+            },
+            "timestamp": "2023-08-17T10:13:26.357Z"
          },
-         "timestamp": "2023-08-17T10:13:26.357Z"
-      },
-      {
-         "id": "64ddf4efb7b6a73ae0cd6eae",
-         "channelId": "channel1",
-         "assetId": "asset1",
-         "action": "LINK",
-         "payload": {
+         {
+            "id": "64ddf4efb7b6a73ae0cd6eae",
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "action": "LINK",
+            "payload": {
                "assetId": "asset1",
                "channelId": "channel1",
                "createdAt": "2023-08-17T08:27:00.909Z",
@@ -727,10 +771,11 @@ Output:
                   ],
                   "standardVersion": 1
                }
-         },
-         "timestamp": "2023-08-17T10:22:39.325Z"
-      }
-   ]
+            },
+            "timestamp": "2023-08-17T10:22:39.325Z"
+         }
+      ]
+   }
 
 **Add Link1 to Asset1 in Channel1 of Node1**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -740,9 +785,9 @@ Output:
    curl --location 'http://localhost:3050/api/v2/nodes/node1.example.com/channels/channel1/assets/asset1/links' \
    --header 'Content-Type: application/json' \
    --data '{
-   "assetUri": "reprehenderit qui culpa deserunt velit",
-   "type": "amet dolore enim velit",
-   "comment": "si",
+   "assetUri": "dbom://node1.test.com/nodes/node2.test.com/channels/channel1/assets/asset2",
+   "type": "DEPENDENT_ON",
+   "comment": "adding link",
    "id": "link2"
    }'
 
@@ -752,7 +797,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully sent request to link asset"
+      "status": "successfully linked asset"
    }
 
 
@@ -769,7 +814,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully sent request to unlink asset"
+      "status": "successfully unlinked asset"
    }
 
 Federation Requests
@@ -791,7 +836,7 @@ Output:
 .. code-block:: json
 
    {
-      "status": "Successfully sent federation request",
+      "status": "successfully created federation request",
       "success": true
    }
 
@@ -807,28 +852,31 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "id": "64ddd903ef1537048d1f6437",
-         "nodeId": "node1",
-         "publicKeys": [],
-         "nodeConnections": [
+   {
+      "success": true,
+      "result": [
+         {
+            "id": "64ddd903ef1537048d1f6437",
+            "nodeId": "node1",
+            "publicKeys": [],
+            "nodeConnections": [
                {
                   "nodeId": "node2",
                   "status": "FEDERATION_SUCCESS",
                   "channelConnections": [
                      {
-                           "channelId": "channel1",
-                           "status": "SENT_CONNECTION_REQUEST",
-                           "access": "READ"
+                        "channelId": "channel1",
+                        "status": "SENT_CONNECTION_REQUEST",
+                        "access": "READ"
                      }
                   ]
                }
-         ],
-         "createdAt": "2023-08-17T08:23:31.695Z",
-         "modifiedAt": "2023-08-17T08:28:21.234Z"
-      }
-   ]
+            ],
+            "createdAt": "2023-08-17T08:23:31.695Z",
+            "modifiedAt": "2023-08-17T08:28:21.234Z"
+         }
+      ]
+   } 
 
 
 **Check Channel Join Request Status in Node1 Metadata**
@@ -843,28 +891,31 @@ Output:
 
 .. code-block:: json
 
-   [
       {
-         "id": "64ddd9039ddeb7835e1bc976",
-         "nodeId": "node2",
-         "publicKeys": [],
-         "nodeConnections": [
-               {
-                  "nodeId": "node1",
-                  "status": "FEDERATION_SUCCESS",
-                  "channelConnections": [
-                     {
+         "success": true,
+         "result": [
+            {
+               "id": "64ddd9039ddeb7835e1bc976",
+               "nodeId": "node2",
+               "publicKeys": [],
+               "nodeConnections": [
+                  {
+                     "nodeId": "node1",
+                     "status": "FEDERATION_SUCCESS",
+                     "channelConnections": [
+                        {
                            "channelId": "channel1",
                            "status": "RECEIVED_CONNECTION_REQUEST",
                            "access": "READ"
-                     }
-                  ]
-               }
-         ],
-         "createdAt": "2023-08-17T08:23:31.357Z",
-         "modifiedAt": "2023-08-17T10:39:39.158Z"
+                        }
+                     ]
+                  }
+               ],
+               "createdAt": "2023-08-17T08:23:31.357Z",
+               "modifiedAt": "2023-08-17T10:39:39.158Z"
+            }
+         ]
       }
-   ]
 
 **Check Requests on Node2**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -936,7 +987,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully accepted federation request"
+      "status": "successfully accepted federation request"
    }
 
 **Reject Channel1 Access request on Node2**
@@ -956,7 +1007,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully rejected federation request"
+      "status": "successfully rejected federation request"
    }
 
 **Revoke Channel1 Access request on Node2**
@@ -979,7 +1030,7 @@ Output:
 
    {
       "success": true,
-      "status": "Successfully sent revoke request"
+      "status": "successfully revoked access"
    }
 
 **Access Channel1 of Node2 on Node1 (After Channel Join Request is accepted)**
@@ -994,22 +1045,19 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "channelId": "channel1",
-         "description": "Channel1 of Node 2 - Remote",
-         "type": "TEST_CHANNEL",
-         "notaries": [
-               {
-                  "id": "ahgsduih",
-                  "type": "SIGNED",
-                  "config": {}
-               }
-         ],
-         "createdAt": "2023-08-17T08:26:55.626Z",
-         "modifiedAt": "2023-08-17T08:26:55.626Z"
-      }
-   ]
+   {
+    "success": true,
+    "result": [
+         {
+            "channelId": "channel1",
+            "description": "Channel1 of Node 2 - Remote",
+            "type": "TEST_CHANNEL",
+            "notaries": [],
+            "createdAt": "2023-08-17T08:26:55.626Z",
+            "modifiedAt": "2023-08-17T08:26:55.626Z"
+         }
+      ]
+   }
 
 **Access Assets of Channel1 of Node2 from Node1 (After Channel Join Request is accepted)**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1026,11 +1074,13 @@ Output:
 
 .. code-block:: json
 
-   [
-      {
-         "channelId": "channel1",
-         "assetId": "asset1",
-         "payload": {
+   {
+      "success": true,
+      "result": [
+         {
+            "channelId": "channel1",
+            "assetId": "asset1",
+            "payload": {
                "standardVersion": 1,
                "schemaUrl": "https://raw.githubusercontent.com/spdx/spdx-spec/development/v2.3.1/schemas/spdx-schema.json",
                "createdAt": "2023-05-15T12:34:56Z",
@@ -1061,9 +1111,10 @@ Output:
                   }
                ],
                "body": {}
+            }
          }
-      }
-   ]
+      ]
+   }
 
 
 ================

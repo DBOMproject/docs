@@ -11,11 +11,12 @@ Each partner or organization needs to instantiate a DBoM node to exchange attest
 
 -	DBoM Gateway
 -	Repository Agent (Database Agent)
+-	Notary Agent
 -   [WIP] Pub-Sub Queue
 -   [WIP] Channel Management
 -   [WIP] Policy Controller
 -   [WIP] Identity and Signing Service
--	[WIP] Notary Agent
+
 
 .. image:: _static/img/dbom-hl-v2.png
     :alt: DBoM V2 - High Level Architecture
@@ -72,6 +73,11 @@ Repository Agent (Database Agent)
 The repository agent is responsible for abstracting CRUD, rich query and list operations for a given data repository. 
 
 ======
+Notary Agent
+======
+The notary agent is responsible for abstracting the “notarization” operation of a notary, including interfacing to key management systems to access secrets (such as private keys, passwords, and wallets), and holding configuration objects such as smart contract addresses.
+
+======
 [WIP] Pub-Sub Queue
 ======
 This is a newly introduced microservice that is responsible for all pub-sub operations.
@@ -90,9 +96,3 @@ This is a newly introduced microservice that is the single point of control for 
 [WIP] Identity and Signing Service
 ======
 This is a newly introduced microservice that takes care of all operations around the cryptographic identity of the DBoM Node.
-
-======
-[WIP] Notary Agent
-======
-The notary agent is responsible for abstracting the “notarization” operation of a notary, including interfacing to key management systems to access secrets (such as private keys, passwords, and wallets), and holding configuration objects such as smart contract addresses.
-
