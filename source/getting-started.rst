@@ -12,7 +12,6 @@ This tutorial will describe how to get started with the digital bill of material
 -  database-agent
 -  nats
 -  mongodb (local - with prisma)
--  notary-agent (local - basic implementation)
 
 Once these containers are running, the DBoM gateway (chainsource-gateway) provides a REST interface with the APIs as described in the `API Specs <https://github.com/DBOMproject/api-specs/tree/2.0.0-alpha-1>`__ 
 
